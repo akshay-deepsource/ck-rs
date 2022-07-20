@@ -1,25 +1,25 @@
-/// Consider a language like so:
-///
-/// ```text
-/// exp ::= x | i | b | binary | if_expr
-///
-/// x ::= <identifiers>
-/// i ::= <integers>
-/// b ::= true | false
-///
-/// binary ::= exp + exp
-///          | exp * exp
-///          | exp and exp
-///          | exp or exp
-///
-/// if_expr ::= if exp
-///             then exp
-///             else exp
-///
-/// ```
-///
-/// with primitive types, Integer and Boolean, complete
-/// the type-checking rules provided by TypeCtx
+//! Consider a language like so:
+//!
+//! ```text
+//! exp ::= x | i | b | binary | if_expr
+//!
+//! x ::= <identifiers>
+//! i ::= <integers>
+//! b ::= true | false
+//!
+//! binary ::= exp + exp
+//!          | exp * exp
+//!          | exp and exp
+//!          | exp or exp
+//!
+//! if_expr ::= if exp
+//!             then exp
+//!             else exp
+//!
+//! ```
+//!
+//! with primitive types, [`Integer`](Type::Integer) and [`Boolean`](Type::Boolean),
+//! complete the type-checking capabilities provided by [`TypeChecker`](TypeChecker).
 use std::{borrow::Borrow, collections::HashMap};
 
 /// The different productions of our grammar
@@ -33,7 +33,10 @@ pub enum Expr {
 }
 
 /// The Binary expression
+///
+/// ```
 /// binary ::= <lhs> <op> <rhs>
+/// ```
 #[derive(Debug)]
 pub struct BinExpr {
     pub lhs: Expr,
@@ -42,7 +45,10 @@ pub struct BinExpr {
 }
 
 /// The If expression
+///
+/// ```
 /// if_expr ::= if <condition> then <then> else <else_>
+/// ```
 #[derive(Debug)]
 pub struct IfExpr {
     pub condition: Expr,
@@ -69,27 +75,31 @@ pub enum Type {
     Boolean,
 }
 
-/// TypeEnv tracks the types of variable bindings
+/// `TypeEnv` tracks the types of variable bindings
 #[derive(Debug)]
 pub struct TypeEnv(HashMap<String, Type>);
 
 impl TypeEnv {
+    /// Initialize an empty environment
     pub fn empty() -> Self {
         Self { 0: HashMap::new() }
     }
 
+    /// Add a (binding, type) pair into the environment
     pub fn extend<K: AsRef<str>>(&mut self, key: K, value: Type) {
         self.0.insert(key.as_ref().to_owned(), value);
     }
 
+    /// Retrieve the type of a binding
     pub fn lookup(&self, key: &str) -> Type {
         *self.0.get(key).expect("unbound variable")
     }
 }
 
+/// Check and infer types of expressions
 #[derive(Debug)]
 pub struct TypeChecker {
-    pub environment: TypeEnv,
+    environment: TypeEnv,
 }
 
 impl TypeChecker {
